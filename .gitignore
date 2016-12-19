@@ -27,3 +27,7 @@
 *.exe
 *.out
 *.app
+
+# our ignores
+/build*
+CMakeUser.cmake
