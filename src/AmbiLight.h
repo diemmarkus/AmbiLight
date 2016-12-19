@@ -25,32 +25,10 @@
 #pragma once
 
 #pragma warning(push, 0)	// no warnings from includes
-#include <QScreen>
-#include <QGuiApplication>
-#include <QColor>
 #pragma warning(pop)
-
-#include "KMeans.h"
 
 // Qt defines
 
 namespace al {
-
-class ScreenRecorder {
-
-public:
-	ScreenRecorder(QScreen* screen = QGuiApplication::primaryScreen());
-
-	QPixmap pixmap() const;
-	QColor screenColor() const;
-	QPixmap debugPixmap() const;
-
-private:
-	QScreen* mScreen = 0;
-
-	QColor findDominantColor(const QPixmap& pm) const;
-	QVector<QColor> saturatedColors(const QImage& pm) const;
-	QVector<kmeans::Point> toPoints(const QVector<QColor>& cols) const;
-};
 
 };

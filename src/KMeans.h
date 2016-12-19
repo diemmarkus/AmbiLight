@@ -25,32 +25,77 @@
 #pragma once
 
 #pragma warning(push, 0)	// no warnings from includes
-#include <QScreen>
-#include <QGuiApplication>
 #include <QColor>
+#include <QVector>
 #pragma warning(pop)
-
-#include "KMeans.h"
 
 // Qt defines
 
-namespace al {
+// read defines
+namespace kmeans {
 
-class ScreenRecorder {
+	class Center;
 
-public:
-	ScreenRecorder(QScreen* screen = QGuiApplication::primaryScreen());
+	class Point {
 
-	QPixmap pixmap() const;
-	QColor screenColor() const;
-	QPixmap debugPixmap() const;
+	public:
+		Point(int nDims = 3);
 
-private:
-	QScreen* mScreen = 0;
+		void operator+=(const Point& p);
 
-	QColor findDominantColor(const QPixmap& pm) const;
-	QVector<QColor> saturatedColors(const QImage& pm) const;
-	QVector<kmeans::Point> toPoints(const QVector<QColor>& cols) const;
-};
+		void setColor(const QColor& col);
+		QColor color() const;
+
+		void setGroup(int g);
+		int group() const;
+
+		double dist(const Point& pt) const;
+		bool update(const QVector<Center>& centers);
+
+		QString toString() const;
+
+		enum ColorIndex {
+			red,
+			green,
+			blue
+		};
+
+	protected:
+		QVector<double> mVals;
+		int mGroup = 0;
+	};
+
+	class Center : public Point {
+
+	public:
+		Center();
+
+		void addPoint(const Point& p);
+		int count() const;
+
+		void normalize();
+
+	};
+
+	typedef QVector<Point> Points;
+	typedef QVector<Center> Centers;
+
+	class KMeans {
+	
+	public:
+		KMeans(const Points& pts = Points());
+
+		void cluster(int numClusters = 10);
+
+		Points points() const;
+		Centers centers() const;
+		Center dominantCenter() const;
+
+	private:
+		Points mPts;
+		Centers mCenters;
+
+		Centers cluster(Points& pts, int numClusters) const;
+	};
 
 };
