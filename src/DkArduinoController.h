@@ -22,52 +22,59 @@
  [1] http://nomacs.org
  *******************************************************************************************************/
 
-#include "AmbiLight.h"
-#include "DkArduinoController.h"
+#pragma warning(push, 0)	// no warnings from includes - begin
+#include <QThread>
+#include <QColor>
+#pragma warning(pop)		// no warnings from includes - end
 
-#include <cassert>
+#include <windows.h>	// needed to read from serial
 
-#pragma warning(push, 0)	// no warnings from includes
-#include <QObject>
-#include <QDebug>
-#pragma warning(pop)
+#ifndef DllExport
+#ifdef DK_DLL_EXPORT
+#define DllExport Q_DECL_EXPORT
+#elif DK_DLL_IMPORT
+#define DllExport Q_DECL_IMPORT
+#else
+#define DllExport
+#endif
+#endif
 
 namespace al {
 
-//  --------------------------------------------------------------------
-AmbientLight::AmbientLight(QObject* parent) : QObject(parent) {
+class DllExport DkArduinoController : public QThread {
+	Q_OBJECT
 
-	mController = new DkArduinoController(this);
+public:
+	DkArduinoController(QObject* widget = 0);
+	~DkArduinoController();
 
-	mUpdateTimer.setInterval(250);
-	mUpdateTimer.setSingleShot(false);
-	connect(&mUpdateTimer, SIGNAL(timeout()), this, SLOT(update()));
+	void setComPort(const QString& cP) { comPort = cP; };
+	void setColor(const QColor & col);
 
-}
+	void initComPort();
+	void run();
+	void quit() {
+		stop = true;
+	};
+	
+signals:
+	void controllerSignal(int controller, int value) const;
 
-DkArduinoController * AmbientLight::controller() const {
-	return mController;
-}
+protected:
+	HANDLE hCOM;
 
-void AmbientLight::start() {
-	mUpdateTimer.start();
+	QColor mColor;
+	bool mWriteColor = false;
+	QString comPort;
+	bool stop;
 
-	if (mController)
-		mController->initComPort();
-}
+	void init();
+	void serialValue(unsigned short val) const;
+	void printComParams(const DCB& dcb) const;
 
-void AmbientLight::update() {
+	void readSettings();
+	void writeSettings() const;
 
-	// get current screen color
-	QColor col = mRecorder.screenColor();
+};
 
-	//// update AmbiColor
-	if (col != mLastColor) {
-
-		qDebug() << "new color: " << col.name();
-		mController->setColor(col);
-		mLastColor = col;
-	}
-}
-
-}
+};

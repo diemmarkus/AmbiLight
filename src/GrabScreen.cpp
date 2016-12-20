@@ -2,22 +2,20 @@
  AmbiLight is the cheapjack version of Philips TV lighting system.
   
  Copyright (C) 2016 Markus Diem <diem@caa.tuwien.ac.at>
- Copyright (C) 2016 Stefan Fiel <fiel@caa.tuwien.ac.at>
- Copyright (C) 2016 Florian Kleber <kleber@caa.tuwien.ac.at>
 
  This file is part of AmbiLight.
 
  AmbiLight is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
+ it under the terms of the GNU Lesser General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
 
  AmbiLight is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+ GNU Lesser General Public License for more details.
 
- You should have received a copy of the GNU General Public License
+ You should have received a copy of the GNU Lesser General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
  related links:
@@ -90,7 +88,7 @@ QColor ScreenRecorder::findDominantColor(const QPixmap & pm) const {
 	
 	// cluster
 	kmeans::KMeans km(toPoints(cols));
-	km.cluster(2);
+	km.cluster(10);
 
 	//qDebug() << "dominant center" << km.dominantCenter().toString();
 
@@ -101,8 +99,8 @@ QVector<QColor> ScreenRecorder::saturatedColors(const QImage & img) const {
 
 
 	// params
-	int minSaturation = 100;
-	int minValue = 100;	// is needed for black pixels might have a high saturation
+	int minSaturation = 50;
+	int minValue = 80;	// is needed for black pixels might have a high saturation
 
 	QVector<QColor> colors;
 
