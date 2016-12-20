@@ -96,22 +96,23 @@ void loop() {
 // this is for the ambient light control
 void updateColor() {
   
+  // all values are aligned with a magic byte (43)
+  // red
   byte sb = Serial.read();
   if (sb != MAGIC_BYTE) 
     return;
-
   byte red = Serial.read();
 
+  // green
   sb = Serial.read();
   if (sb != MAGIC_BYTE) 
     return;
-  
   byte green = Serial.read();
 
+  // blue
   sb = Serial.read();
   if (sb != MAGIC_BYTE) 
     return;
-
   byte blue = Serial.read();
 
   analogWrite(STRIP_RED,   red);

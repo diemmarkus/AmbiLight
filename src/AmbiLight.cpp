@@ -23,7 +23,7 @@
  *******************************************************************************************************/
 
 #include "AmbiLight.h"
-#include "DkArduinoController.h"
+#include "ArduinoController.h"
 
 #include <cassert>
 
@@ -37,7 +37,7 @@ namespace al {
 //  --------------------------------------------------------------------
 AmbientLight::AmbientLight(QObject* parent) : QObject(parent) {
 
-	mController = new ArduinoController(this);
+	mController = new ArduinoController();
 
 	mUpdateTimer.setInterval(250);
 	mUpdateTimer.setSingleShot(false);

@@ -22,7 +22,7 @@
  [1] http://nomacs.org
  *******************************************************************************************************/
 
-#include "DkUtils.h"
+#include "Utils.h"
 
 #pragma warning(push, 0)	// no warnings from includes - begin
 #include <QImageReader>
