@@ -35,46 +35,38 @@
 
 namespace al {
 
-// DkArduinoController --------------------------------------------------------------------
-DkArduinoController::DkArduinoController(QObject* parent) : QThread(parent) {
-	init();
+// ArduinoController --------------------------------------------------------------------
+ArduinoController::ArduinoController() {
+	comPort = "COM5";
 	readSettings();
 }
 
-DkArduinoController::~DkArduinoController() {
+ArduinoController::~ArduinoController() {
 	writeSettings();
 }
 
-void DkArduinoController::init() {
-
-	comPort = "COM5";
-	stop = false;
-}
-
-void DkArduinoController::readSettings() {
+void ArduinoController::readSettings() {
 	
 	QSettings& settings = Settings::instance().getSettings();
-	settings.beginGroup("DkArduinoController");
 	
+	settings.beginGroup("ArduinoController");
 	comPort = settings.value("comPort", comPort).toString();
-	
 	settings.endGroup();
 	
 }
 
-void DkArduinoController::writeSettings() const {
+void ArduinoController::writeSettings() const {
 
 	QSettings& settings = Settings::instance().getSettings();
-	settings.beginGroup("DkArduinoController");
 	
+	settings.beginGroup("ArduinoController");
 	settings.setValue("comPort", comPort);
-
 	settings.endGroup();
 
-	qDebug() << "[DkArduinoController] settings written...";
+	qDebug() << "[ArduinoController] settings written...";
 }
 
-void DkArduinoController::initComPort() {
+void ArduinoController::initComPort() {
 
 	std::wstring comPortStd = DkUtils::qStringToStdWString(comPort);
 	hCOM = CreateFileW((LPCWSTR)comPortStd.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
@@ -107,9 +99,8 @@ void DkArduinoController::initComPort() {
 	dcb.XonLim = 2048;
 
 	// Set new state.
-	if (!SetCommState(hCOM, &dcb)) {
+	if (!SetCommState(hCOM, &dcb))
 		qDebug() << "cannot set com state!";
-	}
 
 	if (!GetCommState(hCOM, &dcb))     // get current DCB
 		qDebug() << "error in get COM state...";
@@ -121,9 +112,9 @@ void DkArduinoController::initComPort() {
 	PurgeComm(hCOM, PURGE_RXCLEAR);
 }
 
-void DkArduinoController::setColor(const QColor & col) {
+void ArduinoController::setColor(const QColor & col) {
+	
 	mColor = col;
-	//mWriteColor = true;
 
 	DWORD written;
 	byte magicByteW = 11;
@@ -142,105 +133,7 @@ void DkArduinoController::setColor(const QColor & col) {
 	qDebug() << "new color set";
 }
 
-void DkArduinoController::run() {
-
-	//qDebug() << "starting thread...";
-	//
-	//std::wstring comPortStd = DkUtils::qStringToStdWString(comPort);
-	//hCOM = CreateFileW((LPCWSTR)comPortStd.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-
-	//if (hCOM == INVALID_HANDLE_VALUE) {
-	//	qDebug() << "hCOM " << comPort << " is NULL....";
-	//	return;
-	//}
-	//else {
-	//	qDebug() << comPort << "is up and running...\n";
-	//}
-
-	//DCB dcb;
-
-	//FillMemory(&dcb, sizeof(dcb), 0);
-	//if (!GetCommState(hCOM, &dcb))     // get current DCB
-	//	qDebug() << "error in get COM state...";
-
-	////qDebug() << "dcb defaults ------------------------";
-	////printComParams(dcb);
-
-	//// set params for serial port communication
-	//dcb.BaudRate = CBR_9600;
-	//dcb.ByteSize = 8;
-	////dcb.EofChar = 0xFE;		// þ - should be that... (small letter thorn)
-	////dcb.ErrorChar = 0x01;		// SOH (start of heading)
-	//dcb.fDtrControl = DTR_CONTROL_ENABLE;
-	//dcb.fTXContinueOnXoff = 1;
-	//dcb.XoffLim = 512;
-	//dcb.XonLim = 2048;
-
-	//// Set new state.
-	//if (!SetCommState(hCOM, &dcb)) {
-	//	qDebug() << "cannot set com state!";
-	//}
-
-	//if (!GetCommState(hCOM, &dcb))     // get current DCB
-	//	qDebug() << "error in get COM state...";
-
-	////qDebug() << "\n\ndcb our params ------------------------";
-	////printComParams(dcb);
-
-	//// clear all operations that were performed _before_ we started...
-	//PurgeComm(hCOM, PURGE_RXCLEAR);
-
-	//DWORD read;
-	//DWORD written;
-
-	//////////////////////////////////
-	//for (;;) {
-
-	//	Sleep(5);
-	//	if (stop)
-	//		break;
-
-	//	//if (!GetCommModemStatus(hCOM, modemStat))
-	//	//	printf("error in getCommModemStatus...\n");
-
-	//	if (mWriteColor) {
-
-	//		byte magicByteW = 43;
-	//		WriteFile(hCOM, &magicByteW, sizeof(magicByteW), &written, NULL);
-
-	//		QColor col = mColor;// QColor(0, 0, 255);
-	//		//QRgb col = r.rgb();// mColor.rgb();
-	//		byte red = col.red();
-	//		WriteFile(hCOM, &red, sizeof(red), &written, NULL);
-	//		byte green = col.green();
-	//		WriteFile(hCOM, &green, sizeof(green), &written, NULL);
-	//		byte blue = col.blue();
-	//		WriteFile(hCOM, &blue, sizeof(blue), &written, NULL);
-
-	//		qDebug() << "I wrote: " << written << "bytes, #rgb:" << col << "color:" << mColor.red() << "," << mColor.green() << "," << mColor.blue();
-	//		//qDebug() << "when shifting:" << (unsigned char)(col >> 16) << "," << (unsigned char)(col >> 8) << "," << (unsigned char)(col >> 0);
-
-	//		mWriteColor = false;
-	//	}
-
-	//	byte magicByte = 0;
-	//	ReadFile(hCOM, &magicByte, sizeof(magicByte), &read, NULL);
-	//	qDebug() << "I read: " << read << "magic byte:" << magicByte;
-
-	//	if (magicByte == 42) {
-	//		unsigned short buffer = 0;
-	//		ReadFile(hCOM, &buffer, sizeof(buffer), &read, NULL);
-
-	//		qDebug() << "buffer" << buffer;
-
-	//		serialValue(buffer);
-	//	}
-
-	//}
-
-}
-
-void DkArduinoController::printComParams(const DCB& dcb) const {
+void ArduinoController::printComParams(const DCB& dcb) const {
 
 	qDebug() << "BaudRate" << dcb.BaudRate;
 	qDebug() << "ByteSize"<< dcb.ByteSize;
@@ -270,14 +163,6 @@ void DkArduinoController::printComParams(const DCB& dcb) const {
 	qDebug() << "XoffLim" << dcb.XoffLim;
 	qDebug() << "XonChar" << dcb.XonChar;
 	qDebug() << "XonLim" << dcb.XonLim;
-}
-
-void DkArduinoController::serialValue(unsigned short val) const {
-
-	unsigned short value = (val & 0x03ff);
-	unsigned short controller = ((val & 0xfc00) >> 10) ;
-
-	emit controllerSignal((int)controller, (int)value);
 }
 
 }

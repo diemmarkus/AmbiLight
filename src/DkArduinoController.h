@@ -41,35 +41,23 @@
 
 namespace al {
 
-class DllExport DkArduinoController : public QThread {
-	Q_OBJECT
+class DllExport ArduinoController {
 
 public:
-	DkArduinoController(QObject* widget = 0);
-	~DkArduinoController();
+	ArduinoController();
+	~ArduinoController();
 
 	void setComPort(const QString& cP) { comPort = cP; };
 	void setColor(const QColor & col);
 
 	void initComPort();
-	void run();
-	void quit() {
-		stop = true;
-	};
 	
-signals:
-	void controllerSignal(int controller, int value) const;
-
 protected:
 	HANDLE hCOM;
 
 	QColor mColor;
-	bool mWriteColor = false;
 	QString comPort;
-	bool stop;
 
-	void init();
-	void serialValue(unsigned short val) const;
 	void printComParams(const DCB& dcb) const;
 
 	void readSettings();

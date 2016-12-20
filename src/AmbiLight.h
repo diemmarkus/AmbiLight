@@ -35,7 +35,7 @@
 
 namespace al {
 
-class DkArduinoController;
+class ArduinoController;
 
 class AmbientLight : public QObject {
 	Q_OBJECT
@@ -43,7 +43,7 @@ class AmbientLight : public QObject {
 public:
 	AmbientLight(QObject* parent = 0);
 
-	DkArduinoController* controller() const;
+	ArduinoController* controller() const;
 
 	void start();
 
@@ -51,7 +51,7 @@ public slots:
 	void update();
 
 private:
-	DkArduinoController* mController = 0;
+	ArduinoController* mController = 0;
 	ScreenRecorder mRecorder;
 	QColor mLastColor;
 	QTimer mUpdateTimer;

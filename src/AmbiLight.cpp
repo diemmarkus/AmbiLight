@@ -37,7 +37,7 @@ namespace al {
 //  --------------------------------------------------------------------
 AmbientLight::AmbientLight(QObject* parent) : QObject(parent) {
 
-	mController = new DkArduinoController(this);
+	mController = new ArduinoController(this);
 
 	mUpdateTimer.setInterval(250);
 	mUpdateTimer.setSingleShot(false);
@@ -45,7 +45,7 @@ AmbientLight::AmbientLight(QObject* parent) : QObject(parent) {
 
 }
 
-DkArduinoController * AmbientLight::controller() const {
+ArduinoController * AmbientLight::controller() const {
 	return mController;
 }
 

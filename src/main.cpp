@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
 
 	// set COM port
 	if (!parser.value(comOpt).isEmpty()) {
-		al::DkArduinoController* controller = ambiLight->controller();
+		al::ArduinoController* controller = ambiLight->controller();
 		controller->setComPort(parser.value(comOpt));
 	}
 
