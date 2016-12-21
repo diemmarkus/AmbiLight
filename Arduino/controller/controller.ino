@@ -38,6 +38,44 @@ struct Controller {
   int digital = 0;  
 };
 
+struct Color {
+  
+  Color() {}
+  Color(byte red, byte green, byte blue) {
+     this->red = red;
+     this->green = green;
+     this->blue = blue; 
+  }
+  
+  bool operator==(const Color& col) const {
+    return 
+      this->red == col.red && 
+      this->green == col.green &&
+      this->blue == col.blue;
+  }
+  
+  void interpolate(const Color& col) {
+  
+    red = interpolate(red, col.red);
+    green = interpolate(green, col.green);
+    blue = interpolate(blue, col.blue);
+  }
+  
+  byte interpolate(byte src, byte dst) {
+  
+    int diff = (int)dst - (int)src;
+    diff = diff >> 1;  // divide by two
+    return src + (byte)diff;
+  }
+  
+  byte red = 0;
+  byte green = 0;
+  byte blue = 0;
+};
+
+Color oldColor;
+Color newColor;
+
 Controller c0;	// player 1
 Controller c1;	// player 2
 Controller c2;	// speed controll
@@ -95,6 +133,18 @@ void loop() {
 
 // this is for the ambient light control
 void updateColor() {
+
+  readColor();
+  
+  if (newColor == oldColor)
+    return;
+  
+  // make the old color the new color
+  oldColor.interpolate(newColor);
+  changeLedColor(oldColor);
+}
+
+void readColor() {
   
   // all values are aligned with a magic byte (43)
   // red
@@ -115,9 +165,15 @@ void updateColor() {
     return;
   byte blue = Serial.read();
 
-  analogWrite(STRIP_RED,   red);
-  analogWrite(STRIP_GREEN, green);
-  analogWrite(STRIP_BLUE,  blue);
+  // update color
+  newColor = Color(red, green, blue);
+}
+
+void changeLedColor(struct Color& c) {
+  
+  analogWrite(STRIP_RED,   c.red);
+  analogWrite(STRIP_GREEN, c.green);
+  analogWrite(STRIP_BLUE,  c.blue);  
 }
 
 // check for a new value and print it to the serial port...
