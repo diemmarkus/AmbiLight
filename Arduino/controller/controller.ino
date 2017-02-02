@@ -62,15 +62,19 @@ struct Color {
   }
   
   byte interpolate(byte src, byte dst) {
-  
-    int diff = (int)dst - (int)src;
-    diff = diff >> 1;  // divide by two
-    return src + (byte)diff;
+
+    if (src < dst && 255-src > step)
+      return src+step;
+    else if (src > dst && src > step)
+      return src-step;
+
+    return dst; // done
   }
   
   byte red = 0;
   byte green = 0;
   byte blue = 0;
+  byte step = 2;
 };
 
 Color oldColor;
@@ -106,9 +110,8 @@ void setup() {
   pinMode(STRIP_GREEN, OUTPUT);
   pinMode(STRIP_BLUE, OUTPUT);
 
-  analogWrite(STRIP_RED, 50);
-  analogWrite(STRIP_GREEN, 50);
-  analogWrite(STRIP_BLUE, 0);
+  Color dbg(255,255,0);
+  changeLedColor(dbg);
 
   Serial.begin(9600);          //  setup serial
 }
@@ -138,7 +141,10 @@ void updateColor() {
   
   if (newColor == oldColor)
     return;
-  
+
+  //Color dbg(0,255,0);
+  //changeLedColor(dbg);
+
   // make the old color the new color
   oldColor.interpolate(newColor);
   changeLedColor(oldColor);
@@ -151,6 +157,7 @@ void readColor() {
   byte sb = Serial.read();
   if (sb != MAGIC_BYTE) 
     return;
+  
   byte red = Serial.read();
 
   // green

@@ -130,7 +130,7 @@ void ArduinoController::setColor(const QColor & col) {
 	WriteFile(hCOM, &magicByteW, sizeof(magicByteW), &written, NULL);
 	WriteFile(hCOM, &blue, sizeof(blue), &written, NULL);
 
-	qDebug() << "new color set";
+	//qDebug() << "new color set";
 }
 
 void ArduinoController::printComParams(const DCB& dcb) const {
